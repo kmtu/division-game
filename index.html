@@ -714,6 +714,28 @@
       margin-bottom: 20px;
     }
 
+    .end-medal {
+      font-size: 4rem;
+      margin: 15px 0;
+    }
+
+    .end-medal-text {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .end-medal-text.gold { color: #f59e0b; }
+    .end-medal-text.silver { color: #6b7280; }
+    .end-medal-text.bronze { color: #b45309; }
+    .end-medal-text.none { color: #9ca3af; }
+
+    .next-tier-hint {
+      font-size: 0.95rem;
+      color: #6b7280;
+      margin-bottom: 20px;
+    }
+
     .end-btn {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
@@ -803,7 +825,9 @@
       <div class="end-screen" id="end-screen">
         <h2>關卡完成！</h2>
         <div class="end-time" id="end-time">0:00</div>
+        <div class="end-medal" id="end-medal"></div>
         <div class="new-record" id="new-record" style="display: none;">新紀錄！</div>
+        <div class="next-tier-hint" id="next-tier-hint"></div>
         <button class="end-btn" onclick="goToMenu()">回到主畫面</button>
       </div>
     </div>
@@ -851,6 +875,16 @@
 
     const TOTAL_QUESTIONS = 10;
 
+    // Medal thresholds (in seconds) for each level
+    const MEDALS = [
+      { gold: 20, silver: 40, bronze: 60 },   // Level 1
+      { gold: 25, silver: 50, bronze: 75 },   // Level 2
+      { gold: 30, silver: 60, bronze: 90 },   // Level 3
+      { gold: 80, silver: 140, bronze: 200 }, // Level 4
+      { gold: 25, silver: 50, bronze: 75 },   // Level 5
+      { gold: 70, silver: 130, bronze: 190 }, // Level 6
+    ];
+
     // Avatar options for player profiles
     const AVATARS = [
       '🦁', '🐼', '🦊', '🐸', '🦄',  // Animals
@@ -896,6 +930,14 @@
         save: '儲存',
         deletePlayer: '刪除玩家',
         nameRequired: '請輸入玩家名稱！',
+        goldMedal: '🥇 金牌！',
+        silverMedal: '🥈 銀牌！',
+        bronzeMedal: '🥉 銅牌！',
+        noMedal: '繼續努力！',
+        nextTierGold: (time) => `${time} 秒內可得金牌`,
+        nextTierSilver: (time) => `${time} 秒內可得銀牌`,
+        nextTierBronze: (time) => `${time} 秒內可得銅牌`,
+        alreadyGold: '已達最高成就！',
       },
       en: {
         title: 'Division Practice',
@@ -931,6 +973,14 @@
         save: 'Save',
         deletePlayer: 'Delete Player',
         nameRequired: 'Please enter a player name!',
+        goldMedal: '🥇 Gold!',
+        silverMedal: '🥈 Silver!',
+        bronzeMedal: '🥉 Bronze!',
+        noMedal: 'Keep trying!',
+        nextTierGold: (time) => `Under ${time}s for Gold`,
+        nextTierSilver: (time) => `Under ${time}s for Silver`,
+        nextTierBronze: (time) => `Under ${time}s for Bronze`,
+        alreadyGold: 'Top achievement!',
       }
     };
 
@@ -975,6 +1025,18 @@
 
       // Re-render level buttons with new language
       renderLevelButtons();
+
+      // Update dynamic game elements if in game
+      if (gameState.currentLevel !== null) {
+        questionCounter.textContent = t('questionCounter')(gameState.currentQuestion, TOTAL_QUESTIONS);
+
+        // Update medal display if on end screen
+        if (endScreen.classList.contains('show')) {
+          const thresholds = MEDALS[gameState.currentLevel];
+          const medal = getMedal(gameState.currentLevel, gameState.lastElapsedTime);
+          displayMedalResult(medal, thresholds, gameState.lastElapsedTime);
+        }
+      }
     }
 
     // Game state
@@ -991,6 +1053,7 @@
       lastDividend: null,
       lastDivisor: null,
       userInput: null,
+      lastElapsedTime: null,
     };
 
     // DOM elements
@@ -1013,6 +1076,8 @@
     const gameContent = document.getElementById('game-content');
     const endScreen = document.getElementById('end-screen');
     const endTime = document.getElementById('end-time');
+    const endMedal = document.getElementById('end-medal');
+    const nextTierHint = document.getElementById('next-tier-hint');
     const newRecord = document.getElementById('new-record');
     const currentPlayerNameDisplay = document.getElementById('current-player-name');
     const playerModal = document.getElementById('player-modal');
@@ -1428,6 +1493,23 @@
       setupEventListeners();
     }
 
+    // Get medal for a level based on time
+    function getMedal(levelIndex, time) {
+      if (time === null) return null;
+      const thresholds = MEDALS[levelIndex];
+      if (time <= thresholds.gold) return 'gold';
+      if (time <= thresholds.silver) return 'silver';
+      if (time <= thresholds.bronze) return 'bronze';
+      return null;
+    }
+
+    function getMedalIcon(medal) {
+      if (medal === 'gold') return '🥇';
+      if (medal === 'silver') return '🥈';
+      if (medal === 'bronze') return '🥉';
+      return '';
+    }
+
     // Render level buttons
     function renderLevelButtons() {
       const bestTimes = loadBestTimes();
@@ -1437,13 +1519,15 @@
         const btn = document.createElement('button');
         btn.className = 'level-btn';
         const bestTime = bestTimes[index];
+        const medal = getMedal(index, bestTime);
+        const medalIcon = getMedalIcon(medal);
         const levelName = t('levelName')(level.dividendDigits, level.divisorDigits);
         const levelText = t('levelFormat')(index, levelName);
         const bestText = bestTime !== null ? t('bestTime')(formatTime(bestTime)) : t('notAttempted');
 
         btn.innerHTML = `
           <span class="level-name">${levelText}</span>
-          <span class="level-best">${bestText}</span>
+          <span class="level-best">${medalIcon ? `<span class="level-medal">${medalIcon}</span> ` : ''}${bestText}</span>
         `;
         btn.onclick = () => startLevel(index);
         levelButtons.appendChild(btn);
@@ -1582,6 +1666,7 @@
       gameState.startTime = Date.now();
       gameState.lastDividend = null;
       gameState.lastDivisor = null;
+      gameState.lastElapsedTime = null;
 
       menuScreen.style.display = 'none';
       gameScreen.style.display = 'block';
@@ -1708,6 +1793,8 @@
         calcRemainder.classList.add('correct');
         playCorrectSound();
         stopTimer();  // Only pause on correct answer
+        // Capture time for final result (used when level ends)
+        gameState.lastElapsedTime = (Date.now() - gameState.startTime) / 1000;
       } else {
         resultIcon.textContent = '✗';
         resultIcon.classList.add('show', 'incorrect');
@@ -1755,7 +1842,10 @@
     function endLevel() {
       stopTimer();
       gameState.waitingForEnter = false; // Reset state
-      const elapsed = (Date.now() - gameState.startTime) / 1000;
+      // Use the time captured when last correct answer was submitted
+      const elapsed = gameState.lastElapsedTime !== null
+        ? gameState.lastElapsedTime
+        : (Date.now() - gameState.startTime) / 1000;
 
       gameContent.style.display = 'none';
       endScreen.classList.add('show');
@@ -1764,6 +1854,47 @@
       // Update best record
       const isNewRecord = saveBestTime(gameState.currentLevel, elapsed);
       newRecord.style.display = isNewRecord ? 'block' : 'none';
+
+      // Show medal and next tier hint
+      const medal = getMedal(gameState.currentLevel, elapsed);
+      const thresholds = MEDALS[gameState.currentLevel];
+      displayMedalResult(medal, thresholds, elapsed);
+    }
+
+    // Display medal result on end screen
+    function displayMedalResult(medal, thresholds, time) {
+      let medalIcon = '';
+      let medalText = '';
+      let medalClass = 'none';
+      let hintText = '';
+
+      if (medal === 'gold') {
+        medalIcon = '🥇';
+        medalText = t('goldMedal');
+        medalClass = 'gold';
+        hintText = t('alreadyGold');
+      } else if (medal === 'silver') {
+        medalIcon = '🥈';
+        medalText = t('silverMedal');
+        medalClass = 'silver';
+        hintText = t('nextTierGold')(thresholds.gold);
+      } else if (medal === 'bronze') {
+        medalIcon = '🥉';
+        medalText = t('bronzeMedal');
+        medalClass = 'bronze';
+        hintText = t('nextTierSilver')(thresholds.silver);
+      } else {
+        medalIcon = '';
+        medalText = t('noMedal');
+        medalClass = 'none';
+        hintText = t('nextTierBronze')(thresholds.bronze);
+      }
+
+      endMedal.innerHTML = `
+        <div>${medalIcon}</div>
+        <div class="end-medal-text ${medalClass}">${medalText}</div>
+      `;
+      nextTierHint.textContent = hintText;
     }
 
     // Return to menu

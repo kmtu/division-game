@@ -466,6 +466,28 @@
       75% { transform: translateX(5px); }
     }
 
+    /* Language toggle */
+    .lang-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #667eea;
+      color: #667eea;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.9rem;
+      z-index: 1000;
+      transition: all 0.2s;
+    }
+
+    .lang-toggle:hover {
+      background: #667eea;
+      color: white;
+    }
+
     /* End screen */
     .end-screen {
       text-align: center;
@@ -506,8 +528,11 @@
   </style>
 </head>
 <body>
+  <!-- Language toggle -->
+  <button class="lang-toggle" id="lang-toggle" onclick="toggleLanguage()">EN</button>
+
   <div class="container">
-    <!-- 主畫面 -->
+    <!-- Main menu -->
     <div id="menu-screen">
       <h1>除法練習</h1>
       <div class="player-section">
@@ -520,7 +545,7 @@
       <div id="level-buttons"></div>
     </div>
 
-    <!-- 遊戲畫面 -->
+    <!-- Game screen -->
     <div id="game-screen">
       <div class="game-header">
         <button class="back-btn" onclick="goToMenu()">返回</button>
@@ -533,15 +558,15 @@
       <div id="game-content">
         <div class="division-container">
           <div class="division-grid" id="division-grid">
-            <!-- Row 1: 商 -->
+            <!-- Row 1: Quotient -->
             <div class="divisor-spacer" id="divisor-spacer"></div>
             <div class="quotient-cell" id="quotient-cell">
               <input type="text" class="quotient-input" id="quotient-input" maxlength="1" autocomplete="off">
             </div>
-            <!-- Row 2: 除數 | 被除數 -->
+            <!-- Row 2: Divisor | Dividend -->
             <div class="divisor-cell" id="divisor-cell"></div>
             <div class="dividend-cell" id="dividend-cell"></div>
-            <!-- Row 3-4: 計算過程（隱藏直到提交答案） -->
+            <!-- Row 3-4: Calculation (hidden until answer submitted) -->
             <div class="calculation" id="calculation">
               <div class="calc-spacer"></div>
               <div class="calc-cell">
@@ -567,7 +592,7 @@
     </div>
   </div>
 
-  <!-- 玩家管理彈窗 -->
+  <!-- Player management modal -->
   <div class="modal-overlay" id="player-modal">
     <div class="modal">
       <h2>玩家管理</h2>
@@ -592,6 +617,94 @@
     ];
 
     const TOTAL_QUESTIONS = 10;
+
+    // ==================== Internationalization ====================
+
+    const i18n = {
+      zh: {
+        title: '除法練習',
+        switchPlayer: '切換',
+        back: '返回',
+        penaltyHint: '+10秒',
+        continueHint: '按 Enter 繼續',
+        levelComplete: '關卡完成！',
+        newRecord: '新紀錄！',
+        returnToMenu: '回到主畫面',
+        playerManagement: '玩家管理',
+        add: '新增',
+        close: '關閉',
+        inputPlaceholder: '輸入新玩家名稱',
+        levelFormat: (index, name) => `第 ${index + 1} 關：${name}`,
+        levelName: (dividend, divisor) => `${dividend}位數 ÷ ${divisor}位數`,
+        questionCounter: (current, total) => `第 ${current}/${total} 題`,
+        bestTime: (time) => `最佳：${time}`,
+        notAttempted: '尚未挑戰',
+        defaultPlayer: '玩家1',
+        playerExists: '此玩家名稱已存在！',
+        keepOnePlayer: '至少要保留一個玩家！',
+        deleteConfirm: (name) => `確定要刪除玩家「${name}」嗎？所有紀錄將會消失！`,
+      },
+      en: {
+        title: 'Division Practice',
+        switchPlayer: 'Switch',
+        back: 'Back',
+        penaltyHint: '+10s',
+        continueHint: 'Press Enter to continue',
+        levelComplete: 'Level Complete!',
+        newRecord: 'New Record!',
+        returnToMenu: 'Return to Menu',
+        playerManagement: 'Player Management',
+        add: 'Add',
+        close: 'Close',
+        inputPlaceholder: 'Enter player name',
+        levelFormat: (index, name) => `Level ${index + 1}: ${name}`,
+        levelName: (dividend, divisor) => `${dividend}-digit ÷ ${divisor}-digit`,
+        questionCounter: (current, total) => `Question ${current}/${total}`,
+        bestTime: (time) => `Best: ${time}`,
+        notAttempted: 'Not attempted',
+        defaultPlayer: 'Player 1',
+        playerExists: 'Player name already exists!',
+        keepOnePlayer: 'Must keep at least one player!',
+        deleteConfirm: (name) => `Delete player "${name}"? All records will be lost!`,
+      }
+    };
+
+    let currentLang = localStorage.getItem('divisionGameLang') || 'zh';
+
+    function t(key) {
+      return i18n[currentLang][key];
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      localStorage.setItem('divisionGameLang', currentLang);
+      updateLanguage();
+    }
+
+    function updateLanguage() {
+      // Update toggle button text
+      document.getElementById('lang-toggle').textContent = currentLang === 'zh' ? 'EN' : '中';
+
+      // Update static text elements
+      document.querySelector('#menu-screen h1').textContent = t('title');
+      document.querySelector('.switch-player-btn').textContent = t('switchPlayer');
+      document.querySelector('.back-btn').textContent = t('back');
+      document.getElementById('penalty-hint').textContent = t('penaltyHint');
+      document.getElementById('continue-hint').textContent = t('continueHint');
+      document.querySelector('#end-screen h2').textContent = t('levelComplete');
+      document.getElementById('new-record').textContent = t('newRecord');
+      document.querySelector('.end-btn').textContent = t('returnToMenu');
+      document.querySelector('#player-modal h2').textContent = t('playerManagement');
+      document.querySelector('.add-player-btn').textContent = t('add');
+      document.querySelector('.modal-close-btn').textContent = t('close');
+      document.getElementById('new-player-input').placeholder = t('inputPlaceholder');
+
+      // Update page title
+      document.title = t('title');
+
+      // Re-render level buttons with new language
+      renderLevelButtons();
+    }
 
     // Game state
     let gameState = {
@@ -681,10 +794,11 @@
         return JSON.parse(saved);
       }
       // Create default player
+      const defaultPlayerName = t('defaultPlayer');
       const defaultProfiles = {
-        currentPlayer: '玩家1',
+        currentPlayer: defaultPlayerName,
         players: {
-          '玩家1': { bestTimes: LEVELS.map(() => null) }
+          [defaultPlayerName]: { bestTimes: LEVELS.map(() => null) }
         }
       };
       saveProfiles(defaultProfiles);
@@ -741,7 +855,7 @@
 
       const profiles = loadProfiles();
       if (profiles.players[name]) {
-        alert('此玩家名稱已存在！');
+        alert(t('playerExists'));
         return;
       }
 
@@ -760,11 +874,11 @@
       const playerNames = Object.keys(profiles.players);
 
       if (playerNames.length <= 1) {
-        alert('至少要保留一個玩家！');
+        alert(t('keepOnePlayer'));
         return;
       }
 
-      if (!confirm(`確定要刪除玩家「${name}」嗎？所有紀錄將會消失！`)) {
+      if (!confirm(t('deleteConfirm')(name))) {
         return;
       }
 
@@ -828,6 +942,7 @@
 
     // Initialize
     function init() {
+      updateLanguage();
       updatePlayerDisplay();
       renderLevelButtons();
       setupEventListeners();
@@ -842,10 +957,12 @@
         const btn = document.createElement('button');
         btn.className = 'level-btn';
         const bestTime = bestTimes[index];
-        const bestText = bestTime !== null ? `最佳：${formatTime(bestTime)}` : '尚未挑戰';
+        const levelName = t('levelName')(level.dividendDigits, level.divisorDigits);
+        const levelText = t('levelFormat')(index, levelName);
+        const bestText = bestTime !== null ? t('bestTime')(formatTime(bestTime)) : t('notAttempted');
 
         btn.innerHTML = `
-          <span class="level-name">第 ${index + 1} 關：${level.name}</span>
+          <span class="level-name">${levelText}</span>
           <span class="level-best">${bestText}</span>
         `;
         btn.onclick = () => startLevel(index);
@@ -970,7 +1087,7 @@
 
     // Display question
     function displayQuestion() {
-      questionCounter.textContent = `第 ${gameState.currentQuestion}/${TOTAL_QUESTIONS} 題`;
+      questionCounter.textContent = t('questionCounter')(gameState.currentQuestion, TOTAL_QUESTIONS);
 
       // Set divisor and dividend
       divisorCell.textContent = gameState.divisor;

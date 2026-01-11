@@ -52,6 +52,12 @@
       background: #f3f4f6;
       padding: 10px 20px;
       border-radius: 30px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .current-player:hover {
+      background: #e5e7eb;
     }
 
     .player-icon {
@@ -64,19 +70,10 @@
       color: #374151;
     }
 
-    .switch-player-btn {
-      background: #667eea;
-      color: white;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 15px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: background 0.2s;
-    }
-
-    .switch-player-btn:hover {
-      background: #5a6fd6;
+    .player-arrow {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-left: 5px;
     }
 
     /* Main menu */
@@ -742,10 +739,10 @@
     <div id="menu-screen">
       <h1>除法練習</h1>
       <div class="player-section">
-        <div class="current-player">
+        <div class="current-player" onclick="openPlayerModal()">
           <span class="player-icon">👤</span>
           <span class="player-name" id="current-player-name">玩家</span>
-          <button class="switch-player-btn" onclick="openPlayerModal()">切換</button>
+          <span class="player-arrow">▼</span>
         </div>
       </div>
       <div id="level-buttons"></div>
@@ -955,7 +952,6 @@
 
       // Update static text elements
       document.querySelector('#menu-screen h1').textContent = t('title');
-      document.querySelector('.switch-player-btn').textContent = t('switchPlayer');
       document.querySelector('.back-btn').textContent = t('back');
       document.getElementById('penalty-hint').textContent = t('penaltyHint');
       document.getElementById('continue-hint').textContent = t('continueHint');

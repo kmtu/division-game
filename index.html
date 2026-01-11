@@ -898,7 +898,6 @@
     const i18n = {
       zh: {
         title: '除法練習',
-        switchPlayer: '切換',
         back: '返回',
         penaltyHint: '+10秒',
         continueHint: '按 Enter 繼續',
@@ -907,9 +906,7 @@
         newRecord: '新紀錄！',
         returnToMenu: '回到主畫面',
         playerManagement: '選擇玩家',
-        add: '新增',
         close: '關閉',
-        inputPlaceholder: '輸入新玩家名稱',
         levelFormat: (index, name) => `第 ${index + 1} 關：${name}`,
         levelName: (dividend, divisor) => `${dividend}位數 ÷ ${divisor}位數`,
         questionCounter: (current, total) => `第 ${current}/${total} 題`,
@@ -920,7 +917,7 @@
         keepOnePlayer: '至少要保留一個玩家！',
         deleteConfirm: (name) => `確定要刪除玩家「${name}」嗎？所有紀錄將會消失！`,
         selectAvatar: '選擇頭像',
-        customAvatar: '或輸入自訂',
+        customAvatar: '或輸入自訂 Emoji',
         apply: '套用',
         addNewPlayer: '+ 新增玩家',
         editPlayer: '編輯玩家',
@@ -941,7 +938,6 @@
       },
       en: {
         title: 'Division Practice',
-        switchPlayer: 'Switch',
         back: 'Back',
         penaltyHint: '+10s',
         continueHint: 'Press Enter to continue',
@@ -950,9 +946,7 @@
         newRecord: 'New Record!',
         returnToMenu: 'Return to Menu',
         playerManagement: 'Select Player',
-        add: 'Add',
         close: 'Close',
-        inputPlaceholder: 'Enter player name',
         levelFormat: (index, name) => `Level ${index + 1}: ${name}`,
         levelName: (dividend, divisor) => `${dividend}-digit ÷ ${divisor}-digit`,
         questionCounter: (current, total) => `Question ${current}/${total}`,
@@ -963,7 +957,7 @@
         keepOnePlayer: 'Must keep at least one player!',
         deleteConfirm: (name) => `Delete player "${name}"? All records will be lost!`,
         selectAvatar: 'Select Avatar',
-        customAvatar: 'or enter custom',
+        customAvatar: 'or enter custom emoji',
         apply: 'Apply',
         addNewPlayer: '+ Add Player',
         editPlayer: 'Edit Player',
@@ -1034,7 +1028,7 @@
         if (endScreen.classList.contains('show')) {
           const thresholds = MEDALS[gameState.currentLevel];
           const medal = getMedal(gameState.currentLevel, gameState.lastElapsedTime);
-          displayMedalResult(medal, thresholds, gameState.lastElapsedTime);
+          displayMedalResult(medal, thresholds);
         }
       }
     }
@@ -1046,7 +1040,6 @@
       startTime: null,
       dividend: null,
       divisor: null,
-      correctAnswer: null,
       waitingForEnter: false,
       lastAnswerCorrect: false,
       timerInterval: null,
@@ -1700,7 +1693,6 @@
 
       gameState.dividend = dividend;
       gameState.divisor = divisor;
-      gameState.correctAnswer = quotient;
       gameState.currentQuestion++;
 
       displayQuestion();
@@ -1858,15 +1850,15 @@
       // Show medal and next tier hint
       const medal = getMedal(gameState.currentLevel, elapsed);
       const thresholds = MEDALS[gameState.currentLevel];
-      displayMedalResult(medal, thresholds, elapsed);
+      displayMedalResult(medal, thresholds);
     }
 
     // Display medal result on end screen
-    function displayMedalResult(medal, thresholds, time) {
+    function displayMedalResult(medal, thresholds) {
       let medalIcon = '';
-      let medalText = '';
+      let medalText = t('noMedal');
       let medalClass = 'none';
-      let hintText = '';
+      let hintText = t('nextTierBronze')(thresholds.bronze);
 
       if (medal === 'gold') {
         medalIcon = '🥇';
@@ -1883,11 +1875,6 @@
         medalText = t('bronzeMedal');
         medalClass = 'bronze';
         hintText = t('nextTierSilver')(thresholds.silver);
-      } else {
-        medalIcon = '';
-        medalText = t('noMedal');
-        medalClass = 'none';
-        hintText = t('nextTierBronze')(thresholds.bronze);
       }
 
       endMedal.innerHTML = `

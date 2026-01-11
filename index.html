@@ -1047,6 +1047,7 @@
       lastDivisor: null,
       userInput: null,
       lastElapsedTime: null,
+      pausedAt: null,
     };
 
     // DOM elements
@@ -1660,6 +1661,7 @@
       gameState.lastDividend = null;
       gameState.lastDivisor = null;
       gameState.lastElapsedTime = null;
+      gameState.pausedAt = null;
 
       menuScreen.style.display = 'none';
       gameScreen.style.display = 'block';
@@ -1898,6 +1900,12 @@
       if (gameState.timerInterval) {
         clearInterval(gameState.timerInterval);
       }
+      // Adjust startTime to account for paused duration
+      if (gameState.pausedAt) {
+        const pausedDuration = Date.now() - gameState.pausedAt;
+        gameState.startTime += pausedDuration;
+        gameState.pausedAt = null;
+      }
       gameState.timerInterval = setInterval(updateTimer, 100);
       timerDisplay.classList.remove('paused');
     }
@@ -1906,6 +1914,7 @@
       if (gameState.timerInterval) {
         clearInterval(gameState.timerInterval);
         gameState.timerInterval = null;
+        gameState.pausedAt = Date.now();
       }
       timerDisplay.classList.add('paused');
     }

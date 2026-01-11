@@ -931,9 +931,9 @@
         silverMedal: '🥈 銀牌！',
         bronzeMedal: '🥉 銅牌！',
         noMedal: '繼續努力！',
-        nextTierGold: (time) => `${time} 秒內可得金牌`,
-        nextTierSilver: (time) => `${time} 秒內可得銀牌`,
-        nextTierBronze: (time) => `${time} 秒內可得銅牌`,
+        nextTierGold: (time) => `${time} 內可得金牌`,
+        nextTierSilver: (time) => `${time} 內可得銀牌`,
+        nextTierBronze: (time) => `${time} 內可得銅牌`,
         alreadyGold: '已達最高成就！',
       },
       en: {
@@ -971,9 +971,9 @@
         silverMedal: '🥈 Silver!',
         bronzeMedal: '🥉 Bronze!',
         noMedal: 'Keep trying!',
-        nextTierGold: (time) => `Under ${time}s for Gold`,
-        nextTierSilver: (time) => `Under ${time}s for Silver`,
-        nextTierBronze: (time) => `Under ${time}s for Bronze`,
+        nextTierGold: (time) => `Under ${time} for Gold`,
+        nextTierSilver: (time) => `Under ${time} for Silver`,
+        nextTierBronze: (time) => `Under ${time} for Bronze`,
         alreadyGold: 'Top achievement!',
       }
     };
@@ -1860,7 +1860,7 @@
       let medalIcon = '';
       let medalText = t('noMedal');
       let medalClass = 'none';
-      let hintText = t('nextTierBronze')(thresholds.bronze);
+      let hintText = t('nextTierBronze')(formatTimeSimple(thresholds.bronze));
 
       if (medal === 'gold') {
         medalIcon = '🥇';
@@ -1871,12 +1871,12 @@
         medalIcon = '🥈';
         medalText = t('silverMedal');
         medalClass = 'silver';
-        hintText = t('nextTierGold')(thresholds.gold);
+        hintText = t('nextTierGold')(formatTimeSimple(thresholds.gold));
       } else if (medal === 'bronze') {
         medalIcon = '🥉';
         medalText = t('bronzeMedal');
         medalClass = 'bronze';
-        hintText = t('nextTierSilver')(thresholds.silver);
+        hintText = t('nextTierSilver')(formatTimeSimple(thresholds.silver));
       }
 
       endMedal.innerHTML = `
@@ -1929,6 +1929,13 @@
       const mins = Math.floor(seconds / 60);
       const secs = (seconds % 60).toFixed(1);
       return `${mins}:${secs.padStart(4, '0')}`;
+    }
+
+    // Format time without decimals (for medal thresholds)
+    function formatTimeSimple(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
 
     // Initialize game

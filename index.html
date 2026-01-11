@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>除法練習</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 2rem;
+    }
+
+    /* Player section */
+    .player-section {
+      text-align: center;
+      margin-bottom: 25px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .current-player {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #f3f4f6;
+      padding: 10px 20px;
+      border-radius: 30px;
+    }
+
+    .player-icon {
+      font-size: 1.5rem;
+    }
+
+    .player-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #374151;
+    }
+
+    .switch-player-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    .switch-player-btn:hover {
+      background: #5a6fd6;
+    }
+
+    /* Main menu */
+    #menu-screen {
+      display: block;
+    }
+
+    #game-screen {
+      display: none;
+    }
+
+    .level-btn {
+      display: block;
+      width: 100%;
+      padding: 15px 20px;
+      margin-bottom: 12px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-align: left;
+    }
+
+    .level-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .level-btn:active {
+      transform: translateY(0);
+    }
+
+    .level-btn .level-name {
+      font-weight: bold;
+      display: block;
+    }
+
+    .level-btn .level-best {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal h2 {
+      margin-bottom: 20px;
+      color: #333;
+      text-align: center;
+    }
+
+    .player-list {
+      margin-bottom: 20px;
+    }
+
+    .player-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 15px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: #f3f4f6;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .player-item:hover {
+      background: #e5e7eb;
+    }
+
+    .player-item.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .player-item-name {
+      font-weight: 500;
+    }
+
+    .player-item-delete {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0 5px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .player-item-delete:hover {
+      opacity: 1;
+    }
+
+    .player-item.active .player-item-delete {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .add-player-form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .add-player-input {
+      flex: 1;
+      padding: 10px 15px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .add-player-input:focus {
+      border-color: #667eea;
+    }
+
+    .add-player-btn {
+      background: #22c55e;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+
+    .add-player-btn:hover {
+      background: #16a34a;
+    }
+
+    .modal-close-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: #e5e7eb;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #374151;
+      transition: background 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      background: #d1d5db;
+    }
+
+    /* Game screen */
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .back-btn {
+      background: #e5e7eb;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #374151;
+      transition: background 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #d1d5db;
+    }
+
+    .game-info {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .question-counter {
+      font-size: 1rem;
+      color: #374151;
+    }
+
+    .timer {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      font-family: monospace;
+    }
+
+    /* Long division - using CSS Grid for alignment */
+    .division-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 30px 0;
+      font-family: "Courier New", monospace;
+      font-size: 2rem;
+    }
+
+    .division-grid {
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: 0;
+    }
+
+    /* Row 1: spacer + quotient */
+    .divisor-spacer {
+      /* Placeholder, same width as divisor */
+    }
+
+    .quotient-cell {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 0 15px 5px 10px;
+    }
+
+    .quotient-input {
+      width: 50px;
+      height: 45px;
+      font-size: 1.8rem;
+      text-align: center;
+      border: 3px solid #667eea;
+      border-radius: 10px;
+      outline: none;
+      font-family: "Courier New", monospace;
+    }
+
+    .quotient-input:focus {
+      border-color: #764ba2;
+      box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.2);
+    }
+
+    .quotient-display {
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* Row 2: divisor + dividend */
+    .divisor-cell {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding-right: 8px;
+      padding-top: 8px;
+    }
+
+    .dividend-cell {
+      border-left: 3px solid #333;
+      border-top: 3px solid #333;
+      border-top-left-radius: 10px;
+      padding: 8px 15px 8px 10px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    /* Calculation steps - also aligned */
+    .calc-spacer {
+      /* Same width as divisor */
+    }
+
+    .calc-cell {
+      padding: 0 15px 0 10px;
+    }
+
+    .calc-row {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .calc-subtract {
+      color: #ef4444;
+    }
+
+    .calc-line {
+      border-top: 2px solid #333;
+      margin: 5px 0;
+    }
+
+    .calc-remainder {
+      font-weight: bold;
+    }
+
+    .calc-remainder.correct {
+      color: #22c55e;
+    }
+
+    .calc-remainder.incorrect {
+      color: #ef4444;
+    }
+
+    .calculation {
+      display: none;
+    }
+
+    .calculation.show {
+      display: contents;
+    }
+
+    /* Result display */
+    .result-icon {
+      text-align: center;
+      font-size: 5rem;
+      margin: 20px 0;
+      display: none;
+    }
+
+    .result-icon.show {
+      display: block;
+      animation: pop 0.3s ease-out;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0); }
+      70% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .result-icon.correct {
+      color: #22c55e;
+    }
+
+    .result-icon.incorrect {
+      color: #ef4444;
+    }
+
+    .continue-hint {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 0.95rem;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .continue-hint.show {
+      display: block;
+    }
+
+    .penalty-hint {
+      text-align: center;
+      color: #ef4444;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .penalty-hint.show {
+      display: block;
+      animation: shake 0.3s ease-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    /* End screen */
+    .end-screen {
+      text-align: center;
+      display: none;
+    }
+
+    .end-screen.show {
+      display: block;
+    }
+
+    .end-time {
+      font-size: 3rem;
+      color: #667eea;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .new-record {
+      color: #22c55e;
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+
+    .end-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .end-btn:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 主畫面 -->
+    <div id="menu-screen">
+      <h1>除法練習</h1>
+      <div class="player-section">
+        <div class="current-player">
+          <span class="player-icon">👤</span>
+          <span class="player-name" id="current-player-name">玩家</span>
+          <button class="switch-player-btn" onclick="openPlayerModal()">切換</button>
+        </div>
+      </div>
+      <div id="level-buttons"></div>
+    </div>
+
+    <!-- 遊戲畫面 -->
+    <div id="game-screen">
+      <div class="game-header">
+        <button class="back-btn" onclick="goToMenu()">返回</button>
+        <div class="game-info">
+          <span class="question-counter" id="question-counter">第 1/10 題</span>
+          <span class="timer" id="timer">0:00</span>
+        </div>
+      </div>
+
+      <div id="game-content">
+        <div class="division-container">
+          <div class="division-grid" id="division-grid">
+            <!-- Row 1: 商 -->
+            <div class="divisor-spacer" id="divisor-spacer"></div>
+            <div class="quotient-cell" id="quotient-cell">
+              <input type="text" class="quotient-input" id="quotient-input" maxlength="1" autocomplete="off">
+            </div>
+            <!-- Row 2: 除數 | 被除數 -->
+            <div class="divisor-cell" id="divisor-cell"></div>
+            <div class="dividend-cell" id="dividend-cell"></div>
+            <!-- Row 3-4: 計算過程（隱藏直到提交答案） -->
+            <div class="calculation" id="calculation">
+              <div class="calc-spacer"></div>
+              <div class="calc-cell">
+                <div class="calc-row calc-subtract" id="calc-product"></div>
+                <div class="calc-line"></div>
+                <div class="calc-row calc-remainder" id="calc-remainder"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-icon" id="result-icon"></div>
+        <div class="penalty-hint" id="penalty-hint">+10秒</div>
+        <div class="continue-hint" id="continue-hint">按 Enter 繼續</div>
+      </div>
+
+      <div class="end-screen" id="end-screen">
+        <h2>關卡完成！</h2>
+        <div class="end-time" id="end-time">0:00</div>
+        <div class="new-record" id="new-record" style="display: none;">新紀錄！</div>
+        <button class="end-btn" onclick="goToMenu()">回到主畫面</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 玩家管理彈窗 -->
+  <div class="modal-overlay" id="player-modal">
+    <div class="modal">
+      <h2>玩家管理</h2>
+      <div class="add-player-form">
+        <input type="text" class="add-player-input" id="new-player-input" placeholder="輸入新玩家名稱" maxlength="10">
+        <button class="add-player-btn" onclick="addPlayer()">新增</button>
+      </div>
+      <div class="player-list" id="player-list"></div>
+      <button class="modal-close-btn" onclick="closePlayerModal()">關閉</button>
+    </div>
+  </div>
+
+  <script>
+    // Level configuration
+    const LEVELS = [
+      { name: "1位數 ÷ 1位數", dividendDigits: 1, divisorDigits: 1 },
+      { name: "2位數 ÷ 1位數", dividendDigits: 2, divisorDigits: 1 },
+      { name: "2位數 ÷ 2位數", dividendDigits: 2, divisorDigits: 2 },
+      { name: "3位數 ÷ 2位數", dividendDigits: 3, divisorDigits: 2 },
+      { name: "3位數 ÷ 3位數", dividendDigits: 3, divisorDigits: 3 },
+      { name: "4位數 ÷ 3位數", dividendDigits: 4, divisorDigits: 3 },
+    ];
+
+    const TOTAL_QUESTIONS = 10;
+
+    // Game state
+    let gameState = {
+      currentLevel: null,
+      currentQuestion: 0,
+      startTime: null,
+      dividend: null,
+      divisor: null,
+      correctAnswer: null,
+      waitingForEnter: false,
+      lastAnswerCorrect: false,
+      timerInterval: null,
+      lastDividend: null,
+      lastDivisor: null,
+    };
+
+    // DOM elements
+    const menuScreen = document.getElementById('menu-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const levelButtons = document.getElementById('level-buttons');
+    const questionCounter = document.getElementById('question-counter');
+    const timerDisplay = document.getElementById('timer');
+    const divisorSpacer = document.getElementById('divisor-spacer');
+    const divisorCell = document.getElementById('divisor-cell');
+    const dividendCell = document.getElementById('dividend-cell');
+    const quotientCell = document.getElementById('quotient-cell');
+    const calculation = document.getElementById('calculation');
+    const calcProduct = document.getElementById('calc-product');
+    const calcRemainder = document.getElementById('calc-remainder');
+    const resultIcon = document.getElementById('result-icon');
+    const penaltyHint = document.getElementById('penalty-hint');
+    const continueHint = document.getElementById('continue-hint');
+    const gameContent = document.getElementById('game-content');
+    const endScreen = document.getElementById('end-screen');
+    const endTime = document.getElementById('end-time');
+    const newRecord = document.getElementById('new-record');
+    const currentPlayerNameDisplay = document.getElementById('current-player-name');
+    const playerModal = document.getElementById('player-modal');
+    const playerList = document.getElementById('player-list');
+    const newPlayerInput = document.getElementById('new-player-input');
+
+    // ==================== Sound Effects ====================
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playCorrectSound() {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+      oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+      oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.4);
+    }
+
+    function playWrongSound() {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.type = 'sawtooth';
+      oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.3);
+
+      gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    }
+
+    // ==================== Profile Management ====================
+
+    function loadProfiles() {
+      const saved = localStorage.getItem('divisionGameProfiles');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+      // Create default player
+      const defaultProfiles = {
+        currentPlayer: '玩家1',
+        players: {
+          '玩家1': { bestTimes: LEVELS.map(() => null) }
+        }
+      };
+      saveProfiles(defaultProfiles);
+      return defaultProfiles;
+    }
+
+    function saveProfiles(profiles) {
+      localStorage.setItem('divisionGameProfiles', JSON.stringify(profiles));
+    }
+
+    function getCurrentPlayerName() {
+      const profiles = loadProfiles();
+      return profiles.currentPlayer;
+    }
+
+    function loadBestTimes() {
+      const profiles = loadProfiles();
+      const playerData = profiles.players[profiles.currentPlayer];
+      if (playerData && playerData.bestTimes) {
+        return playerData.bestTimes;
+      }
+      return LEVELS.map(() => null);
+    }
+
+    function saveBestTime(levelIndex, time) {
+      const profiles = loadProfiles();
+      const currentPlayer = profiles.currentPlayer;
+      if (!profiles.players[currentPlayer]) {
+        profiles.players[currentPlayer] = { bestTimes: LEVELS.map(() => null) };
+      }
+      const currentBest = profiles.players[currentPlayer].bestTimes[levelIndex];
+      if (currentBest === null || time < currentBest) {
+        profiles.players[currentPlayer].bestTimes[levelIndex] = time;
+        saveProfiles(profiles);
+        return true; // New record
+      }
+      return false;
+    }
+
+    function switchPlayer(name) {
+      const profiles = loadProfiles();
+      if (profiles.players[name]) {
+        profiles.currentPlayer = name;
+        saveProfiles(profiles);
+        updatePlayerDisplay();
+        renderLevelButtons();
+        renderPlayerList();
+      }
+    }
+
+    function addPlayer() {
+      const name = newPlayerInput.value.trim();
+      if (!name) return;
+
+      const profiles = loadProfiles();
+      if (profiles.players[name]) {
+        alert('此玩家名稱已存在！');
+        return;
+      }
+
+      profiles.players[name] = { bestTimes: LEVELS.map(() => null) };
+      profiles.currentPlayer = name;
+      saveProfiles(profiles);
+
+      newPlayerInput.value = '';
+      updatePlayerDisplay();
+      renderLevelButtons();
+      renderPlayerList();
+    }
+
+    function deletePlayer(name) {
+      const profiles = loadProfiles();
+      const playerNames = Object.keys(profiles.players);
+
+      if (playerNames.length <= 1) {
+        alert('至少要保留一個玩家！');
+        return;
+      }
+
+      if (!confirm(`確定要刪除玩家「${name}」嗎？所有紀錄將會消失！`)) {
+        return;
+      }
+
+      delete profiles.players[name];
+
+      // If deleted player was current, switch to another
+      if (profiles.currentPlayer === name) {
+        profiles.currentPlayer = Object.keys(profiles.players)[0];
+      }
+
+      saveProfiles(profiles);
+      updatePlayerDisplay();
+      renderLevelButtons();
+      renderPlayerList();
+    }
+
+    function updatePlayerDisplay() {
+      currentPlayerNameDisplay.textContent = getCurrentPlayerName();
+    }
+
+    function openPlayerModal() {
+      renderPlayerList();
+      playerModal.classList.add('show');
+      newPlayerInput.focus();
+    }
+
+    function closePlayerModal() {
+      playerModal.classList.remove('show');
+    }
+
+    function renderPlayerList() {
+      const profiles = loadProfiles();
+      const currentPlayer = profiles.currentPlayer;
+      const playerNames = Object.keys(profiles.players);
+
+      playerList.innerHTML = '';
+      playerNames.forEach(name => {
+        const item = document.createElement('div');
+        item.className = 'player-item' + (name === currentPlayer ? ' active' : '');
+        item.onclick = () => switchPlayer(name); // Entire item is clickable
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'player-item-name';
+        nameSpan.textContent = name;
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'player-item-delete';
+        deleteBtn.textContent = '✕';
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation(); // Prevent triggering switch
+          deletePlayer(name);
+        };
+
+        item.appendChild(nameSpan);
+        item.appendChild(deleteBtn);
+        playerList.appendChild(item);
+      });
+    }
+
+    // ==================== Game Logic ====================
+
+    // Initialize
+    function init() {
+      updatePlayerDisplay();
+      renderLevelButtons();
+      setupEventListeners();
+    }
+
+    // Render level buttons
+    function renderLevelButtons() {
+      const bestTimes = loadBestTimes();
+      levelButtons.innerHTML = '';
+
+      LEVELS.forEach((level, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'level-btn';
+        const bestTime = bestTimes[index];
+        const bestText = bestTime !== null ? `最佳：${formatTime(bestTime)}` : '尚未挑戰';
+
+        btn.innerHTML = `
+          <span class="level-name">第 ${index + 1} 關：${level.name}</span>
+          <span class="level-best">${bestText}</span>
+        `;
+        btn.onclick = () => startLevel(index);
+        levelButtons.appendChild(btn);
+      });
+    }
+
+    // Set up event listeners
+    function setupEventListeners() {
+      document.addEventListener('keydown', handleGlobalKeydown);
+
+      // New player input Enter key event
+      newPlayerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addPlayer();
+        }
+      });
+
+      // Close modal when clicking outside
+      playerModal.addEventListener('click', (e) => {
+        if (e.target === playerModal) {
+          closePlayerModal();
+        }
+      });
+    }
+
+    // Handle input keydown events
+    function handleInputKeydown(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        e.stopPropagation(); // Prevent event bubbling
+        if (!gameState.waitingForEnter) {
+          submitAnswer();
+        }
+      }
+    }
+
+    // Handle global keydown
+    function handleGlobalKeydown(e) {
+      if (e.key === 'Enter') {
+        // If on end screen, press Enter to return to menu
+        if (endScreen.classList.contains('show')) {
+          e.preventDefault();
+          goToMenu();
+          return;
+        }
+        // If waiting for Enter to continue
+        if (gameState.waitingForEnter) {
+          e.preventDefault();
+          if (gameState.lastAnswerCorrect) {
+            nextQuestion();
+          } else {
+            resetQuestion();
+          }
+        }
+      }
+    }
+
+    // Start level
+    function startLevel(levelIndex) {
+      gameState.currentLevel = levelIndex;
+      gameState.currentQuestion = 0;
+      gameState.startTime = Date.now();
+      gameState.lastDividend = null;
+      gameState.lastDivisor = null;
+
+      menuScreen.style.display = 'none';
+      gameScreen.style.display = 'block';
+      gameContent.style.display = 'block';
+      endScreen.classList.remove('show');
+
+      startTimer();
+      generateQuestion();
+    }
+
+    // Generate question
+    function generateQuestion() {
+      const level = LEVELS[gameState.currentLevel];
+      let dividend, divisor, quotient;
+
+      // Generate valid question, avoid consecutive duplicates
+      do {
+        // Divisor minimum is 2, avoid too easy
+        divisor = generateNumber(level.divisorDigits, 2);
+        quotient = Math.floor(Math.random() * 9) + 1; // 1-9
+        const remainder = Math.floor(Math.random() * divisor);
+        dividend = divisor * quotient + remainder;
+      } while (
+        !isValidDividend(dividend, level.dividendDigits) ||
+        (dividend === gameState.lastDividend && divisor === gameState.lastDivisor)
+      );
+
+      // Record this question for next check
+      gameState.lastDividend = dividend;
+      gameState.lastDivisor = divisor;
+
+      gameState.dividend = dividend;
+      gameState.divisor = divisor;
+      gameState.correctAnswer = quotient;
+      gameState.currentQuestion++;
+
+      displayQuestion();
+    }
+
+    // Generate number with specified digits
+    function generateNumber(digits, minValue = 1) {
+      let min = digits === 1 ? 1 : Math.pow(10, digits - 1);
+      if (min < minValue) {
+        min = minValue;
+      }
+      const max = Math.pow(10, digits) - 1;
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Check if dividend meets digit requirements
+    function isValidDividend(dividend, digits) {
+      const min = digits === 1 ? 1 : Math.pow(10, digits - 1);
+      const max = Math.pow(10, digits) - 1;
+      return dividend >= min && dividend <= max;
+    }
+
+    // Display question
+    function displayQuestion() {
+      questionCounter.textContent = `第 ${gameState.currentQuestion}/${TOTAL_QUESTIONS} 題`;
+
+      // Set divisor and dividend
+      divisorCell.textContent = gameState.divisor;
+      dividendCell.textContent = gameState.dividend;
+
+      // Make spacer same width as divisor
+      divisorSpacer.textContent = gameState.divisor;
+      divisorSpacer.style.visibility = 'hidden';
+
+      // Reset quotient input
+      quotientCell.innerHTML = '<input type="text" class="quotient-input" id="quotient-input" maxlength="1" autocomplete="off">';
+      const newInput = document.getElementById('quotient-input');
+      newInput.addEventListener('keydown', handleInputKeydown);
+      newInput.focus();
+
+      calculation.classList.remove('show');
+      resultIcon.classList.remove('show', 'correct', 'incorrect');
+      continueHint.classList.remove('show');
+      penaltyHint.classList.remove('show');
+      calcRemainder.classList.remove('correct', 'incorrect');
+
+      gameState.waitingForEnter = false;
+
+      // Ensure timer is running (for next question)
+      if (!gameState.timerInterval) {
+        startTimer();
+      }
+    }
+
+    // Submit answer
+    function submitAnswer() {
+      const input = document.getElementById('quotient-input');
+      const userAnswer = parseInt(input.value);
+
+      if (isNaN(userAnswer) || userAnswer < 0 || userAnswer > 9) {
+        return;
+      }
+
+      // Calculate result
+      const product = gameState.divisor * userAnswer;
+      const remainder = gameState.dividend - product;
+
+      // Show calculation process
+      quotientCell.innerHTML = `<span class="quotient-display">${userAnswer}</span>`;
+      calcProduct.textContent = `-${product}`;
+      calcRemainder.textContent = remainder;
+      calculation.classList.add('show');
+
+      // Check correctness
+      const isCorrect = remainder >= 0 && remainder < gameState.divisor;
+      gameState.lastAnswerCorrect = isCorrect;
+      gameState.waitingForEnter = true;
+
+      if (isCorrect) {
+        resultIcon.textContent = '✓';
+        resultIcon.classList.add('show', 'correct');
+        calcRemainder.classList.add('correct');
+        playCorrectSound();
+      } else {
+        resultIcon.textContent = '✗';
+        resultIcon.classList.add('show', 'incorrect');
+        calcRemainder.classList.add('incorrect');
+        // Wrong answer: 10 second penalty
+        gameState.startTime -= 10000;
+        updateTimer(); // Update display immediately
+        penaltyHint.classList.add('show');
+        playWrongSound();
+      }
+
+      // Pause timer to let user see the calculation
+      stopTimer();
+
+      continueHint.classList.add('show');
+    }
+
+    // Reset question (when wrong)
+    function resetQuestion() {
+      quotientCell.innerHTML = '<input type="text" class="quotient-input" id="quotient-input" maxlength="1" autocomplete="off">';
+      const newInput = document.getElementById('quotient-input');
+      newInput.addEventListener('keydown', handleInputKeydown);
+      newInput.focus();
+
+      calculation.classList.remove('show');
+      resultIcon.classList.remove('show', 'correct', 'incorrect');
+      continueHint.classList.remove('show');
+      penaltyHint.classList.remove('show');
+      calcRemainder.classList.remove('correct', 'incorrect');
+
+      gameState.waitingForEnter = false;
+
+      // Resume timer
+      startTimer();
+    }
+
+    // Next question
+    function nextQuestion() {
+      if (gameState.currentQuestion >= TOTAL_QUESTIONS) {
+        endLevel();
+      } else {
+        generateQuestion();
+      }
+    }
+
+    // End level
+    function endLevel() {
+      stopTimer();
+      gameState.waitingForEnter = false; // Reset state
+      const elapsed = (Date.now() - gameState.startTime) / 1000;
+
+      gameContent.style.display = 'none';
+      endScreen.classList.add('show');
+      endTime.textContent = formatTime(elapsed);
+
+      // Update best record
+      const isNewRecord = saveBestTime(gameState.currentLevel, elapsed);
+      newRecord.style.display = isNewRecord ? 'block' : 'none';
+    }
+
+    // Return to menu
+    function goToMenu() {
+      stopTimer();
+      menuScreen.style.display = 'block';
+      gameScreen.style.display = 'none';
+      renderLevelButtons();
+    }
+
+    // Timer functions
+    function startTimer() {
+      gameState.timerInterval = setInterval(updateTimer, 100);
+    }
+
+    function stopTimer() {
+      if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+        gameState.timerInterval = null;
+      }
+    }
+
+    function updateTimer() {
+      const elapsed = (Date.now() - gameState.startTime) / 1000;
+      timerDisplay.textContent = formatTime(elapsed);
+    }
+
+    // Format time
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = (seconds % 60).toFixed(1);
+      return `${mins}:${secs.padStart(4, '0')}`;
+    }
+
+    // Initialize game
+    init();
+  </script>
+</body>
+</html>

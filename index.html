@@ -1106,6 +1106,13 @@
 
     // Handle global keydown
     function handleGlobalKeydown(e) {
+      // Esc always goes back to menu (when in game)
+      if (e.key === 'Escape' && gameScreen.style.display === 'block') {
+        e.preventDefault();
+        goToMenu();
+        return;
+      }
+
       // If on end screen, press Enter to return to menu
       if (e.key === 'Enter' && endScreen.classList.contains('show')) {
         e.preventDefault();
@@ -1147,6 +1154,15 @@
         if (e.key === 'Enter' && gameState.userInput !== null) {
           e.preventDefault();
           submitAnswer();
+        }
+      }
+
+      // Main menu: number keys 1-6 to select level
+      if (menuScreen.style.display === 'block') {
+        if (e.key >= '1' && e.key <= '6') {
+          e.preventDefault();
+          const levelIndex = Number.parseInt(e.key) - 1;
+          startLevel(levelIndex);
         }
       }
     }

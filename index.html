@@ -324,25 +324,51 @@
       padding: 0 15px 5px 10px;
     }
 
-    .quotient-input {
-      width: 50px;
-      height: 45px;
-      font-size: 1.8rem;
-      text-align: center;
-      border: 3px solid #667eea;
-      border-radius: 10px;
-      outline: none;
-      font-family: "Courier New", monospace;
-    }
-
-    .quotient-input:focus {
-      border-color: #764ba2;
-      box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.2);
-    }
-
     .quotient-display {
       font-weight: bold;
       color: #333;
+    }
+
+    .quotient-placeholder {
+      font-weight: bold;
+      color: #9ca3af;
+    }
+
+    /* Number pad for mobile */
+    .number-pad {
+      display: none;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 240px;
+      margin: 20px auto;
+    }
+
+    /* Show on touch devices */
+    @media (pointer: coarse) {
+      .number-pad {
+        display: grid;
+      }
+    }
+
+    .num-btn {
+      padding: 15px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      border-radius: 12px;
+      border: 2px solid #667eea;
+      background: white;
+      color: #667eea;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .num-btn:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .num-btn:active {
+      transform: scale(0.95);
     }
 
     /* Row 2: divisor + dividend */
@@ -444,6 +470,25 @@
 
     .continue-hint.show {
       display: block;
+    }
+
+    /* Show desktop hint on non-touch devices, mobile hint on touch devices */
+    @media (pointer: coarse) {
+      .continue-hint-desktop.show {
+        display: none;
+      }
+      .continue-hint-mobile.show {
+        display: block;
+      }
+    }
+
+    @media (pointer: fine) {
+      .continue-hint-desktop.show {
+        display: block;
+      }
+      .continue-hint-mobile.show {
+        display: none;
+      }
     }
 
     .penalty-hint {
@@ -561,7 +606,7 @@
             <!-- Row 1: Quotient -->
             <div class="divisor-spacer" id="divisor-spacer"></div>
             <div class="quotient-cell" id="quotient-cell">
-              <input type="text" class="quotient-input" id="quotient-input" maxlength="1" autocomplete="off">
+              <span class="quotient-placeholder">_</span>
             </div>
             <!-- Row 2: Divisor | Dividend -->
             <div class="divisor-cell" id="divisor-cell"></div>
@@ -580,7 +625,21 @@
 
         <div class="result-icon" id="result-icon"></div>
         <div class="penalty-hint" id="penalty-hint">+10秒</div>
-        <div class="continue-hint" id="continue-hint">按 Enter 繼續</div>
+        <div class="continue-hint continue-hint-desktop" id="continue-hint">按 Enter 繼續</div>
+        <div class="continue-hint continue-hint-mobile" id="continue-hint-mobile">點擊任意處繼續</div>
+
+        <!-- Number pad for mobile -->
+        <div class="number-pad" id="number-pad">
+          <button class="num-btn" data-num="1">1</button>
+          <button class="num-btn" data-num="2">2</button>
+          <button class="num-btn" data-num="3">3</button>
+          <button class="num-btn" data-num="4">4</button>
+          <button class="num-btn" data-num="5">5</button>
+          <button class="num-btn" data-num="6">6</button>
+          <button class="num-btn" data-num="7">7</button>
+          <button class="num-btn" data-num="8">8</button>
+          <button class="num-btn" data-num="9">9</button>
+        </div>
       </div>
 
       <div class="end-screen" id="end-screen">
@@ -627,6 +686,7 @@
         back: '返回',
         penaltyHint: '+10秒',
         continueHint: '按 Enter 繼續',
+        continueHintMobile: '點擊任意處繼續',
         levelComplete: '關卡完成！',
         newRecord: '新紀錄！',
         returnToMenu: '回到主畫面',
@@ -650,6 +710,7 @@
         back: 'Back',
         penaltyHint: '+10s',
         continueHint: 'Press Enter to continue',
+        continueHintMobile: 'Tap anywhere to continue',
         levelComplete: 'Level Complete!',
         newRecord: 'New Record!',
         returnToMenu: 'Return to Menu',
@@ -691,6 +752,7 @@
       document.querySelector('.back-btn').textContent = t('back');
       document.getElementById('penalty-hint').textContent = t('penaltyHint');
       document.getElementById('continue-hint').textContent = t('continueHint');
+      document.getElementById('continue-hint-mobile').textContent = t('continueHintMobile');
       document.querySelector('#end-screen h2').textContent = t('levelComplete');
       document.getElementById('new-record').textContent = t('newRecord');
       document.querySelector('.end-btn').textContent = t('returnToMenu');
@@ -719,6 +781,7 @@
       timerInterval: null,
       lastDividend: null,
       lastDivisor: null,
+      userInput: null,
     };
 
     // DOM elements
@@ -737,6 +800,7 @@
     const resultIcon = document.getElementById('result-icon');
     const penaltyHint = document.getElementById('penalty-hint');
     const continueHint = document.getElementById('continue-hint');
+    const continueHintMobile = document.getElementById('continue-hint-mobile');
     const gameContent = document.getElementById('game-content');
     const endScreen = document.getElementById('end-screen');
     const endTime = document.getElementById('end-time');
@@ -988,36 +1052,93 @@
           closePlayerModal();
         }
       });
-    }
 
-    // Handle input keydown events
-    function handleInputKeydown(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        e.stopPropagation(); // Prevent event bubbling
-        if (!gameState.waitingForEnter) {
+      // Number pad button handlers (for mobile)
+      document.querySelectorAll('.num-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+
+          // If in feedback state after wrong answer, reset and submit new answer
+          if (gameState.waitingForEnter && !gameState.lastAnswerCorrect) {
+            resetQuestion();
+            const num = Number.parseInt(btn.dataset.num);
+            gameState.userInput = num;
+            displayUserInput();
+            submitAnswer();
+            return;
+          }
+
+          // If in feedback state after correct answer, go to next question
+          if (gameState.waitingForEnter && gameState.lastAnswerCorrect) {
+            nextQuestion();
+            return;
+          }
+
+          // Normal submission
+          const num = Number.parseInt(btn.dataset.num);
+          gameState.userInput = num;
+          displayUserInput();
           submitAnswer();
+        });
+      });
+
+      // Tap anywhere to continue (for mobile, during feedback state)
+      gameContent.addEventListener('click', (e) => {
+        if (!gameState.waitingForEnter) return;
+        if (e.target.closest('.num-btn')) return;
+
+        e.preventDefault();
+        if (gameState.lastAnswerCorrect) {
+          nextQuestion();
+        } else {
+          resetQuestion();
         }
-      }
+      });
     }
 
     // Handle global keydown
     function handleGlobalKeydown(e) {
-      if (e.key === 'Enter') {
-        // If on end screen, press Enter to return to menu
-        if (endScreen.classList.contains('show')) {
-          e.preventDefault();
-          goToMenu();
-          return;
+      // If on end screen, press Enter to return to menu
+      if (e.key === 'Enter' && endScreen.classList.contains('show')) {
+        e.preventDefault();
+        goToMenu();
+        return;
+      }
+
+      // If waiting for Enter to continue
+      if (e.key === 'Enter' && gameState.waitingForEnter) {
+        e.preventDefault();
+        if (gameState.lastAnswerCorrect) {
+          nextQuestion();
+        } else {
+          resetQuestion();
         }
-        // If waiting for Enter to continue
-        if (gameState.waitingForEnter) {
+        return;
+      }
+
+      // During active gameplay (not waiting, not ended, game screen visible)
+      if (gameScreen.style.display === 'block' &&
+          !gameState.waitingForEnter &&
+          !endScreen.classList.contains('show')) {
+
+        // Number keys: set input
+        if (e.key >= '0' && e.key <= '9') {
           e.preventDefault();
-          if (gameState.lastAnswerCorrect) {
-            nextQuestion();
-          } else {
-            resetQuestion();
-          }
+          gameState.userInput = Number.parseInt(e.key);
+          displayUserInput();
+        }
+
+        // Backspace: clear input
+        if (e.key === 'Backspace') {
+          e.preventDefault();
+          gameState.userInput = null;
+          displayEmptyInput();
+        }
+
+        // Enter: submit if we have input
+        if (e.key === 'Enter' && gameState.userInput !== null) {
+          e.preventDefault();
+          submitAnswer();
         }
       }
     }
@@ -1086,6 +1207,16 @@
     }
 
     // Display question
+    // Display user's input in quotient cell
+    function displayUserInput() {
+      quotientCell.innerHTML = `<span class="quotient-display">${gameState.userInput}</span>`;
+    }
+
+    // Display empty placeholder in quotient cell
+    function displayEmptyInput() {
+      quotientCell.innerHTML = '<span class="quotient-placeholder">_</span>';
+    }
+
     function displayQuestion() {
       questionCounter.textContent = t('questionCounter')(gameState.currentQuestion, TOTAL_QUESTIONS);
 
@@ -1097,15 +1228,14 @@
       divisorSpacer.textContent = gameState.divisor;
       divisorSpacer.style.visibility = 'hidden';
 
-      // Reset quotient input
-      quotientCell.innerHTML = '<input type="text" class="quotient-input" id="quotient-input" maxlength="1" autocomplete="off">';
-      const newInput = document.getElementById('quotient-input');
-      newInput.addEventListener('keydown', handleInputKeydown);
-      newInput.focus();
+      // Reset user input and show placeholder
+      gameState.userInput = null;
+      displayEmptyInput();
 
       calculation.classList.remove('show');
       resultIcon.classList.remove('show', 'correct', 'incorrect');
       continueHint.classList.remove('show');
+      continueHintMobile.classList.remove('show');
       penaltyHint.classList.remove('show');
       calcRemainder.classList.remove('correct', 'incorrect');
 
@@ -1119,10 +1249,9 @@
 
     // Submit answer
     function submitAnswer() {
-      const input = document.getElementById('quotient-input');
-      const userAnswer = parseInt(input.value);
+      const userAnswer = gameState.userInput;
 
-      if (isNaN(userAnswer) || userAnswer < 0 || userAnswer > 9) {
+      if (userAnswer === null || userAnswer < 0 || userAnswer > 9) {
         return;
       }
 
@@ -1131,7 +1260,7 @@
       const remainder = gameState.dividend - product;
 
       // Show calculation process
-      quotientCell.innerHTML = `<span class="quotient-display">${userAnswer}</span>`;
+      displayUserInput();
       calcProduct.textContent = `-${product}`;
       calcRemainder.textContent = remainder;
       calculation.classList.add('show');
@@ -1161,18 +1290,19 @@
       stopTimer();
 
       continueHint.classList.add('show');
+      continueHintMobile.classList.add('show');
     }
 
     // Reset question (when wrong)
     function resetQuestion() {
-      quotientCell.innerHTML = '<input type="text" class="quotient-input" id="quotient-input" maxlength="1" autocomplete="off">';
-      const newInput = document.getElementById('quotient-input');
-      newInput.addEventListener('keydown', handleInputKeydown);
-      newInput.focus();
+      // Reset user input and show placeholder
+      gameState.userInput = null;
+      displayEmptyInput();
 
       calculation.classList.remove('show');
       resultIcon.classList.remove('show', 'correct', 'incorrect');
       continueHint.classList.remove('show');
+      continueHintMobile.classList.remove('show');
       penaltyHint.classList.remove('show');
       calcRemainder.classList.remove('correct', 'incorrect');
 

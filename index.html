@@ -186,57 +186,139 @@
       font-weight: 500;
     }
 
-    .player-item-delete {
+    .player-item-edit-btn {
       background: none;
       border: none;
-      color: #ef4444;
+      color: #9ca3af;
       cursor: pointer;
       font-size: 1.2rem;
-      padding: 0 5px;
+      padding: 5px 10px;
       opacity: 0.7;
-      transition: opacity 0.2s;
+      transition: opacity 0.2s, color 0.2s;
     }
 
-    .player-item-delete:hover {
+    .player-item-edit-btn:hover {
       opacity: 1;
+      color: #667eea;
     }
 
-    .player-item.active .player-item-delete {
-      color: rgba(255, 255, 255, 0.8);
+    .player-item.active .player-item-edit-btn {
+      color: rgba(255, 255, 255, 0.7);
     }
 
-    .add-player-form {
+    .player-item.active .player-item-edit-btn:hover {
+      color: white;
+    }
+
+    .add-player-btn-large {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .add-player-btn-large:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Edit view styles */
+    .edit-view-header {
       display: flex;
+      align-items: center;
       gap: 10px;
       margin-bottom: 20px;
     }
 
-    .add-player-input {
+    .edit-view-header h2 {
+      margin: 0;
       flex: 1;
-      padding: 10px 15px;
-      border: 2px solid #e5e7eb;
-      border-radius: 10px;
-      font-size: 1rem;
-      outline: none;
+      text-align: center;
+      padding-right: 34px; /* Balance the back button */
     }
 
-    .add-player-input:focus {
-      border-color: #667eea;
-    }
-
-    .add-player-btn {
-      background: #22c55e;
-      color: white;
+    .back-to-list-btn {
+      background: #e5e7eb;
       border: none;
-      padding: 10px 20px;
-      border-radius: 10px;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 1.2rem;
+      color: #374151;
       transition: background 0.2s;
     }
 
-    .add-player-btn:hover {
+    .back-to-list-btn:hover {
+      background: #d1d5db;
+    }
+
+    .edit-player-form {
+      margin-bottom: 20px;
+    }
+
+    .edit-label {
+      display: block;
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .edit-player-input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .edit-player-input:focus {
+      border-color: #667eea;
+    }
+
+    .save-player-btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 10px;
+      background: #22c55e;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background 0.2s;
+    }
+
+    .save-player-btn:hover {
       background: #16a34a;
+    }
+
+    .delete-player-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: white;
+      color: #ef4444;
+      border: 2px solid #ef4444;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .delete-player-btn:hover {
+      background: #ef4444;
+      color: white;
     }
 
     .modal-close-btn {
@@ -254,6 +336,77 @@
 
     .modal-close-btn:hover {
       background: #d1d5db;
+    }
+
+    /* Avatar picker */
+    .avatar-section-label {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .avatar-picker {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .avatar-option {
+      font-size: 1.8rem;
+      padding: 8px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+      background: white;
+      transition: all 0.2s;
+    }
+
+    .avatar-option:hover {
+      border-color: #a5b4fc;
+      background: #f5f7ff;
+    }
+
+    .avatar-option.selected {
+      border-color: #667eea;
+      background: #eef2ff;
+    }
+
+    .custom-avatar-input {
+      grid-column: span 5;
+      display: flex;
+      gap: 8px;
+      margin-top: 5px;
+    }
+
+    .custom-avatar-input input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      text-align: center;
+      outline: none;
+    }
+
+    .custom-avatar-input input:focus {
+      border-color: #667eea;
+    }
+
+    .custom-avatar-input button {
+      padding: 8px 16px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .custom-avatar-input button:hover {
+      background: #5a6fd6;
     }
 
     /* Game screen */
@@ -662,13 +815,29 @@
   <!-- Player management modal -->
   <div class="modal-overlay" id="player-modal">
     <div class="modal">
-      <h2>玩家管理</h2>
-      <div class="add-player-form">
-        <input type="text" class="add-player-input" id="new-player-input" placeholder="輸入新玩家名稱" maxlength="10">
-        <button class="add-player-btn" onclick="addPlayer()">新增</button>
+      <!-- View 1: Player List -->
+      <div id="player-list-view">
+        <h2 id="modal-title-list">玩家管理</h2>
+        <div class="player-list" id="player-list"></div>
+        <button class="add-player-btn-large" id="add-player-btn-large" onclick="showEditView(null)">+ 新增玩家</button>
+        <button class="modal-close-btn" onclick="closePlayerModal()">關閉</button>
       </div>
-      <div class="player-list" id="player-list"></div>
-      <button class="modal-close-btn" onclick="closePlayerModal()">關閉</button>
+
+      <!-- View 2: Edit/Add Player -->
+      <div id="player-edit-view" style="display: none;">
+        <div class="edit-view-header">
+          <button class="back-to-list-btn" onclick="showListView()">←</button>
+          <h2 id="modal-title-edit">編輯玩家</h2>
+        </div>
+        <div class="avatar-section-label" id="avatar-section-label">選擇頭像</div>
+        <div class="avatar-picker" id="avatar-picker"></div>
+        <div class="edit-player-form">
+          <label class="edit-label" id="edit-name-label">玩家名稱</label>
+          <input type="text" class="edit-player-input" id="edit-player-input" placeholder="輸入玩家名稱" maxlength="10">
+        </div>
+        <button class="save-player-btn" id="save-player-btn" onclick="savePlayer()">儲存</button>
+        <button class="delete-player-btn" id="delete-player-btn" onclick="deleteCurrentEditPlayer()">刪除玩家</button>
+      </div>
     </div>
   </div>
 
@@ -685,6 +854,14 @@
 
     const TOTAL_QUESTIONS = 10;
 
+    // Avatar options for player profiles
+    const AVATARS = [
+      '🦁', '🐼', '🦊', '🐸', '🦄',  // Animals
+      '🐶', '🐱', '🐰', '🐻', '🐨',  // Cute animals
+      '🦋', '🐢', '🦖', '🐙', '🦈',  // More animals
+      '🚀', '⭐', '🌈', '🎮', '🎨',  // Fun objects
+    ];
+
     // ==================== Internationalization ====================
 
     const i18n = {
@@ -698,7 +875,7 @@
         levelComplete: '關卡完成！',
         newRecord: '新紀錄！',
         returnToMenu: '回到主畫面',
-        playerManagement: '玩家管理',
+        playerManagement: '選擇玩家',
         add: '新增',
         close: '關閉',
         inputPlaceholder: '輸入新玩家名稱',
@@ -711,6 +888,17 @@
         playerExists: '此玩家名稱已存在！',
         keepOnePlayer: '至少要保留一個玩家！',
         deleteConfirm: (name) => `確定要刪除玩家「${name}」嗎？所有紀錄將會消失！`,
+        selectAvatar: '選擇頭像',
+        customAvatar: '或輸入自訂',
+        apply: '套用',
+        addNewPlayer: '+ 新增玩家',
+        editPlayer: '編輯玩家',
+        addPlayer: '新增玩家',
+        playerName: '玩家名稱',
+        namePlaceholder: '輸入玩家名稱',
+        save: '儲存',
+        deletePlayer: '刪除玩家',
+        nameRequired: '請輸入玩家名稱！',
       },
       en: {
         title: 'Division Practice',
@@ -722,7 +910,7 @@
         levelComplete: 'Level Complete!',
         newRecord: 'New Record!',
         returnToMenu: 'Return to Menu',
-        playerManagement: 'Player Management',
+        playerManagement: 'Select Player',
         add: 'Add',
         close: 'Close',
         inputPlaceholder: 'Enter player name',
@@ -735,6 +923,17 @@
         playerExists: 'Player name already exists!',
         keepOnePlayer: 'Must keep at least one player!',
         deleteConfirm: (name) => `Delete player "${name}"? All records will be lost!`,
+        selectAvatar: 'Select Avatar',
+        customAvatar: 'or enter custom',
+        apply: 'Apply',
+        addNewPlayer: '+ Add Player',
+        editPlayer: 'Edit Player',
+        addPlayer: 'Add Player',
+        playerName: 'Player Name',
+        namePlaceholder: 'Enter player name',
+        save: 'Save',
+        deletePlayer: 'Delete Player',
+        nameRequired: 'Please enter a player name!',
       }
     };
 
@@ -764,10 +963,16 @@
       document.querySelector('#end-screen h2').textContent = t('levelComplete');
       document.getElementById('new-record').textContent = t('newRecord');
       document.querySelector('.end-btn').textContent = t('returnToMenu');
-      document.querySelector('#player-modal h2').textContent = t('playerManagement');
-      document.querySelector('.add-player-btn').textContent = t('add');
+
+      // Player modal elements
+      document.getElementById('modal-title-list').textContent = t('playerManagement');
+      document.getElementById('add-player-btn-large').textContent = t('addNewPlayer');
       document.querySelector('.modal-close-btn').textContent = t('close');
-      document.getElementById('new-player-input').placeholder = t('inputPlaceholder');
+      document.getElementById('avatar-section-label').textContent = t('selectAvatar');
+      document.getElementById('edit-name-label').textContent = t('playerName');
+      document.getElementById('edit-player-input').placeholder = t('namePlaceholder');
+      document.getElementById('save-player-btn').textContent = t('save');
+      document.getElementById('delete-player-btn').textContent = t('deletePlayer');
 
       // Update page title
       document.title = t('title');
@@ -816,7 +1021,15 @@
     const currentPlayerNameDisplay = document.getElementById('current-player-name');
     const playerModal = document.getElementById('player-modal');
     const playerList = document.getElementById('player-list');
-    const newPlayerInput = document.getElementById('new-player-input');
+    const avatarPicker = document.getElementById('avatar-picker');
+    const playerListView = document.getElementById('player-list-view');
+    const playerEditView = document.getElementById('player-edit-view');
+    const editPlayerInput = document.getElementById('edit-player-input');
+    const deletePlayerBtn = document.getElementById('delete-player-btn');
+    const modalTitleEdit = document.getElementById('modal-title-edit');
+
+    // Player being edited (null = adding new player, string = editing existing player)
+    let editingPlayer = null;
 
     // ==================== Sound Effects ====================
 
@@ -870,7 +1083,7 @@
       const defaultProfiles = {
         currentPlayer: defaultPlayerName,
         players: {
-          [defaultPlayerName]: { bestTimes: LEVELS.map(() => null) }
+          [defaultPlayerName]: { bestTimes: LEVELS.map(() => null), avatar: AVATARS[0] }
         }
       };
       saveProfiles(defaultProfiles);
@@ -921,26 +1134,6 @@
       }
     }
 
-    function addPlayer() {
-      const name = newPlayerInput.value.trim();
-      if (!name) return;
-
-      const profiles = loadProfiles();
-      if (profiles.players[name]) {
-        alert(t('playerExists'));
-        return;
-      }
-
-      profiles.players[name] = { bestTimes: LEVELS.map(() => null) };
-      profiles.currentPlayer = name;
-      saveProfiles(profiles);
-
-      newPlayerInput.value = '';
-      updatePlayerDisplay();
-      renderLevelButtons();
-      renderPlayerList();
-    }
-
     function deletePlayer(name) {
       const profiles = loadProfiles();
       const playerNames = Object.keys(profiles.players);
@@ -967,18 +1160,113 @@
       renderPlayerList();
     }
 
+    function getCurrentPlayerAvatar() {
+      const profiles = loadProfiles();
+      const playerData = profiles.players[profiles.currentPlayer];
+      return playerData?.avatar || '👤';
+    }
+
+    function changePlayerAvatar(name, avatar) {
+      const profiles = loadProfiles();
+      if (profiles.players[name]) {
+        profiles.players[name].avatar = avatar;
+        saveProfiles(profiles);
+        updatePlayerDisplay();
+        renderPlayerList();
+      }
+    }
+
     function updatePlayerDisplay() {
+      const avatar = getCurrentPlayerAvatar();
+      document.querySelector('.player-icon').textContent = avatar;
       currentPlayerNameDisplay.textContent = getCurrentPlayerName();
     }
 
+    function renderAvatarPicker() {
+      const profiles = loadProfiles();
+      const currentPlayer = profiles.currentPlayer;
+      const currentAvatar = profiles.players[currentPlayer]?.avatar || '👤';
+
+      avatarPicker.innerHTML = '';
+      AVATARS.forEach(avatar => {
+        const btn = document.createElement('div');
+        btn.className = 'avatar-option' + (avatar === currentAvatar ? ' selected' : '');
+        btn.textContent = avatar;
+        btn.onclick = () => {
+          // Immediately change current player's avatar
+          changePlayerAvatar(currentPlayer, avatar);
+          renderAvatarPicker();
+        };
+        avatarPicker.appendChild(btn);
+      });
+
+      // Custom emoji input
+      const customContainer = document.createElement('div');
+      customContainer.className = 'custom-avatar-input';
+
+      const customInput = document.createElement('input');
+      customInput.type = 'text';
+      customInput.maxLength = 2;
+      customInput.placeholder = t('customAvatar');
+
+      const applyBtn = document.createElement('button');
+      applyBtn.textContent = t('apply');
+      applyBtn.onclick = () => {
+        const emoji = customInput.value.trim();
+        if (emoji) {
+          changePlayerAvatar(currentPlayer, emoji);
+          renderAvatarPicker();
+        }
+      };
+
+      customInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          applyBtn.click();
+        }
+      });
+
+      customContainer.appendChild(customInput);
+      customContainer.appendChild(applyBtn);
+      avatarPicker.appendChild(customContainer);
+    }
+
     function openPlayerModal() {
-      renderPlayerList();
+      showListView();
       playerModal.classList.add('show');
-      newPlayerInput.focus();
     }
 
     function closePlayerModal() {
       playerModal.classList.remove('show');
+    }
+
+    function showListView() {
+      playerListView.style.display = 'block';
+      playerEditView.style.display = 'none';
+      editingPlayer = null;
+      renderPlayerList();
+    }
+
+    function showEditView(playerName) {
+      playerListView.style.display = 'none';
+      playerEditView.style.display = 'block';
+      editingPlayer = playerName;
+
+      if (playerName === null) {
+        // Adding new player
+        modalTitleEdit.textContent = t('addPlayer');
+        editPlayerInput.value = '';
+        deletePlayerBtn.style.display = 'none';
+        // Reset avatar picker to first avatar for new player
+        renderAvatarPickerForNew();
+      } else {
+        // Editing existing player
+        modalTitleEdit.textContent = t('editPlayer');
+        editPlayerInput.value = playerName;
+        deletePlayerBtn.style.display = 'block';
+        renderAvatarPicker();
+      }
+      editPlayerInput.focus();
     }
 
     function renderPlayerList() {
@@ -988,26 +1276,150 @@
 
       playerList.innerHTML = '';
       playerNames.forEach(name => {
+        const playerData = profiles.players[name];
+        const avatar = playerData.avatar || '👤';
+
         const item = document.createElement('div');
         item.className = 'player-item' + (name === currentPlayer ? ' active' : '');
-        item.onclick = () => switchPlayer(name); // Entire item is clickable
+        item.onclick = () => {
+          // Switch to this player and close modal
+          if (name !== currentPlayer) {
+            switchPlayer(name);
+          }
+          closePlayerModal();
+        };
+
+        const avatarSpan = document.createElement('span');
+        avatarSpan.style.marginRight = '8px';
+        avatarSpan.style.fontSize = '1.3rem';
+        avatarSpan.textContent = avatar;
 
         const nameSpan = document.createElement('span');
         nameSpan.className = 'player-item-name';
         nameSpan.textContent = name;
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'player-item-delete';
-        deleteBtn.textContent = '✕';
-        deleteBtn.onclick = (e) => {
-          e.stopPropagation(); // Prevent triggering switch
-          deletePlayer(name);
+        const leftContainer = document.createElement('div');
+        leftContainer.style.display = 'flex';
+        leftContainer.style.alignItems = 'center';
+        leftContainer.appendChild(avatarSpan);
+        leftContainer.appendChild(nameSpan);
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'player-item-edit-btn';
+        editBtn.textContent = '✎';
+        editBtn.onclick = (e) => {
+          e.stopPropagation();
+          // Switch to this player first, then edit
+          if (name !== currentPlayer) {
+            switchPlayer(name);
+          }
+          showEditView(name);
         };
 
-        item.appendChild(nameSpan);
-        item.appendChild(deleteBtn);
+        item.appendChild(leftContainer);
+        item.appendChild(editBtn);
         playerList.appendChild(item);
       });
+    }
+
+    function savePlayer() {
+      const newName = editPlayerInput.value.trim();
+      if (!newName) {
+        alert(t('nameRequired'));
+        return;
+      }
+
+      const profiles = loadProfiles();
+
+      if (editingPlayer === null) {
+        // Adding new player
+        if (profiles.players[newName]) {
+          alert(t('playerExists'));
+          return;
+        }
+        // Get the currently selected avatar from the temp state
+        profiles.players[newName] = { bestTimes: LEVELS.map(() => null), avatar: tempNewAvatar || AVATARS[0] };
+        profiles.currentPlayer = newName;
+        saveProfiles(profiles);
+        tempNewAvatar = null;
+      } else {
+        // Editing existing player
+        if (newName !== editingPlayer) {
+          // Name changed
+          if (profiles.players[newName]) {
+            alert(t('playerExists'));
+            return;
+          }
+          // Copy data to new name
+          profiles.players[newName] = profiles.players[editingPlayer];
+          delete profiles.players[editingPlayer];
+
+          // Update current player if renamed
+          if (profiles.currentPlayer === editingPlayer) {
+            profiles.currentPlayer = newName;
+          }
+          saveProfiles(profiles);
+        }
+      }
+
+      updatePlayerDisplay();
+      renderLevelButtons();
+      showListView();
+    }
+
+    function deleteCurrentEditPlayer() {
+      if (editingPlayer === null) return;
+      deletePlayer(editingPlayer);
+      showListView();
+    }
+
+    // Temporary avatar for new player creation
+    let tempNewAvatar = null;
+
+    function renderAvatarPickerForNew() {
+      tempNewAvatar = tempNewAvatar || AVATARS[0];
+
+      avatarPicker.innerHTML = '';
+      AVATARS.forEach(avatar => {
+        const btn = document.createElement('div');
+        btn.className = 'avatar-option' + (avatar === tempNewAvatar ? ' selected' : '');
+        btn.textContent = avatar;
+        btn.onclick = () => {
+          tempNewAvatar = avatar;
+          renderAvatarPickerForNew();
+        };
+        avatarPicker.appendChild(btn);
+      });
+
+      // Custom emoji input
+      const customContainer = document.createElement('div');
+      customContainer.className = 'custom-avatar-input';
+
+      const customInput = document.createElement('input');
+      customInput.type = 'text';
+      customInput.maxLength = 2;
+      customInput.placeholder = t('customAvatar');
+
+      const applyBtn = document.createElement('button');
+      applyBtn.textContent = t('apply');
+      applyBtn.onclick = () => {
+        const emoji = customInput.value.trim();
+        if (emoji) {
+          tempNewAvatar = emoji;
+          renderAvatarPickerForNew();
+        }
+      };
+
+      customInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          applyBtn.click();
+        }
+      });
+
+      customContainer.appendChild(customInput);
+      customContainer.appendChild(applyBtn);
+      avatarPicker.appendChild(customContainer);
     }
 
     // ==================== Game Logic ====================
@@ -1046,11 +1458,11 @@
     function setupEventListeners() {
       document.addEventListener('keydown', handleGlobalKeydown);
 
-      // New player input Enter key event
-      newPlayerInput.addEventListener('keydown', (e) => {
+      // Edit player input Enter key event
+      editPlayerInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
-          addPlayer();
+          savePlayer();
         }
       });
 

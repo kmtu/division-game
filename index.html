@@ -296,6 +296,14 @@
       font-family: monospace;
     }
 
+    .timer.paused {
+      color: #22c55e;
+    }
+
+    .timer.paused::before {
+      content: '⏸ ';
+    }
+
     /* Long division - using CSS Grid for alignment */
     .division-container {
       display: flex;
@@ -1275,19 +1283,17 @@
         resultIcon.classList.add('show', 'correct');
         calcRemainder.classList.add('correct');
         playCorrectSound();
+        stopTimer();  // Only pause on correct answer
       } else {
         resultIcon.textContent = '✗';
         resultIcon.classList.add('show', 'incorrect');
         calcRemainder.classList.add('incorrect');
-        // Wrong answer: 10 second penalty
+        // Wrong answer: 10 second penalty, timer keeps running
         gameState.startTime -= 10000;
-        updateTimer(); // Update display immediately
+        updateTimer();
         penaltyHint.classList.add('show');
         playWrongSound();
       }
-
-      // Pause timer to let user see the calculation
-      stopTimer();
 
       continueHint.classList.add('show');
       continueHintMobile.classList.add('show');
@@ -1346,7 +1352,12 @@
 
     // Timer functions
     function startTimer() {
+      // Clear any existing interval first to prevent duplicates
+      if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+      }
       gameState.timerInterval = setInterval(updateTimer, 100);
+      timerDisplay.classList.remove('paused');
     }
 
     function stopTimer() {
@@ -1354,6 +1365,7 @@
         clearInterval(gameState.timerInterval);
         gameState.timerInterval = null;
       }
+      timerDisplay.classList.add('paused');
     }
 
     function updateTimer() {
